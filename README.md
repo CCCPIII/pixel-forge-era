@@ -17,13 +17,13 @@
 
 ### 在线游玩
 
-直接访问：**https://你的用户名.github.io/pixel-forge-era**
+直接访问：**https://CCCPIII.github.io/pixel-forge-era**
 
 ### 本地运行
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/你的用户名/pixel-forge-era.git
+git clone https://github.com/CCCPIII/pixel-forge-era.git
 cd pixel-forge-era
 ```
 

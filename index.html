@@ -6,12 +6,12 @@
     <title>像素锻造纪元 | Pixel Forge Era</title>
     <meta name="description" content="一个像素风格的 DND RPG 游戏，锻造你的像素武器，书写你的传奇">
     
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- React & ReactDOM (production build) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Babel (standalone for JSX) -->
+    <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
     
     <style>
         * {
@@ -38,6 +38,12 @@
             min-height: 100vh;
             color: #ffd700;
             font-family: serif;
+            gap: 20px;
+        }
+        
+        .loading-icon {
+            font-size: 4rem;
+            animation: float 2s ease-in-out infinite;
         }
         
         .loading-spinner {
@@ -47,25 +53,74 @@
             border-top-color: #ffd700;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .loading-hint {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 20px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
 <body>
     <div id="root">
         <div class="loading">
+            <div class="loading-icon">⚔️🐉🛡️</div>
             <div class="loading-spinner"></div>
-            <div>正在加载像素锻造纪元...</div>
+            <div class="loading-text">正在加载像素锻造纪元...</div>
+            <div class="loading-hint">首次加载可能需要几秒钟</div>
         </div>
     </div>
     
-    <script type="text/babel" src="game.jsx"></script>
-    <script type="text/babel">
-        ReactDOM.createRoot(document.getElementById('root')).render(<DNDGame />);
+    <!-- 加载游戏脚本 -->
+    <script>
+        // 动态加载游戏代码
+        fetch('game.jsx')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load game.jsx');
+                return response.text();
+            })
+            .then(code => {
+                // 使用 Babel 转换 JSX
+                const transformed = Babel.transform(code, { 
+                    presets: ['react'],
+                    filename: 'game.jsx'
+                }).code;
+                
+                // 执行转换后的代码
+                const script = document.createElement('script');
+                script.textContent = transformed;
+                document.body.appendChild(script);
+                
+                // 渲染游戏
+                setTimeout(() => {
+                    if (typeof DNDGame !== 'undefined') {
+                        ReactDOM.createRoot(document.getElementById('root')).render(
+                            React.createElement(DNDGame)
+                        );
+                    } else {
+                        document.getElementById('root').innerHTML = '<div class="loading"><div class="loading-text" style="color:#ff6666">加载失败，请刷新页面重试</div></div>';
+                    }
+                }, 100);
+            })
+            .catch(error => {
+                console.error('Error loading game:', error);
+                document.getElementById('root').innerHTML = '<div class="loading"><div class="loading-text" style="color:#ff6666">加载失败: ' + error.message + '</div><div class="loading-hint">请检查网络连接后刷新页面</div></div>';
+            });
     </script>
 </body>
 </html>
